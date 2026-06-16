@@ -7,7 +7,6 @@ import { z } from "zod";
 import { formatarResultadoTexto, simularFinanciamento } from "./financeLogic.js";
 
 const PORT = Number(process.env.PORT || 3333);
-const OPENAI_APPS_CHALLENGE_TOKEN = "SrE_WLLP-SUonkJR_-KZBm2FMJsWDDGXK_FkfKomF7I";
 const transports = new Map();
 
 const createMcpServer = () => {
@@ -126,17 +125,31 @@ const httpServer = createServer(async (req, res) => {
   const pathname = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`).pathname;
 
   if (pathname === "/.well-known/openai-apps-challenge" && req.method === "GET") {
+    const token = process.env.OPENAI_APPS_CHALLENGE;
+
+    if (!token) {
+      res.writeHead(404, { "content-type": "text/plain" });
+      res.end("Challenge token not configured");
+      return;
+    }
+
     res.writeHead(200, {
       "content-type": "text/plain",
-      "content-length": Buffer.byteLength(OPENAI_APPS_CHALLENGE_TOKEN),
+      "content-length": Buffer.byteLength(token),
     });
-    res.end(OPENAI_APPS_CHALLENGE_TOKEN);
+    res.end(token);
     return;
   }
 
   if (pathname === "/" && req.method === "GET") {
     res.writeHead(200, { "content-type": "application/json" });
-    res.end(JSON.stringify({ ok: true, name: "heroapp-financiamento", mcp: "/mcp" }));
+    res.end(
+      JSON.stringify({
+        status: "ok",
+        service: "heroapp-financiamento-mcp",
+        version: "1.0.0",
+      })
+    );
     return;
   }
 
@@ -146,23 +159,19 @@ const httpServer = createServer(async (req, res) => {
     return;
   }
 
-  if (req.method === "GET" && !req.headers["mcp-session-id"]) {
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(JSON.stringify({ ok: true, transport: "streamable-http", endpoint: "/mcp" }));
+  if (req.method !== "POST") {
+    res.writeHead(405, { "content-type": "application/json", allow: "POST" });
+    res.end(JSON.stringify({ error: "Metodo nao permitido. Use POST /mcp." }));
     return;
   }
 
   try {
     const sessionId = req.headers["mcp-session-id"];
     let transport = sessionId ? transports.get(sessionId) : undefined;
-    let body;
+    const body = await readJsonBody(req);
 
-    if (req.method === "POST") {
-      body = await readJsonBody(req);
-
-      if (!transport && isInitializeRequest(body)) {
-        transport = await createTransport();
-      }
+    if (!transport && isInitializeRequest(body)) {
+      transport = await createTransport();
     }
 
     if (!transport) {

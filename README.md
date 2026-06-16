@@ -32,13 +32,61 @@ O endpoint local fica em:
 http://localhost:3333/mcp
 ```
 
-Para usar no Developer Mode do ChatGPT ou submeter para revisao publica, o MCP precisa estar publicado em HTTPS. Durante desenvolvimento, voce pode apontar um tunel HTTPS para a porta local:
+## Deploy Render
 
-```bash
-ngrok http 3333
+O servidor esta preparado para Render usando a porta definida pela plataforma:
+
+```js
+const PORT = Number(process.env.PORT || 3333);
 ```
 
-Depois substitua `https://SEU-DOMINIO-PUBLICO/mcp` no `chatgpt-app-submission.json` pela URL real.
+Configuracao sugerida no Render:
+
+- Runtime: Node.js 20 ou superior.
+- Build Command: `npm install`.
+- Start Command: `npm start`.
+- Health Check Path: `/`.
+
+O endpoint final de producao do MCP deve ser:
+
+```text
+https://mcp.hero.ia.br/mcp
+```
+
+## Variaveis de ambiente
+
+Configure no Render:
+
+```text
+OPENAI_APPS_CHALLENGE=token_fornecido_pela_validacao_do_OpenAI_Apps
+```
+
+Essa variavel e usada pelo endpoint:
+
+```text
+GET /.well-known/openai-apps-challenge
+```
+
+Se `OPENAI_APPS_CHALLENGE` nao estiver configurada, o endpoint retorna `404` com a mensagem `Challenge token not configured`.
+
+## DNS Cloudflare
+
+No Cloudflare, configure o subdominio `mcp.hero.ia.br` apontando para o dominio publico gerado pelo Render.
+
+Configuracao recomendada:
+
+- Type: `CNAME`.
+- Name: `mcp`.
+- Target: dominio `.onrender.com` do servico Render.
+- Proxy status: habilitado se o SSL/TLS estiver configurado como `Full` ou `Full (strict)`.
+
+Depois confirme que estes endpoints respondem em HTTPS:
+
+```text
+GET https://mcp.hero.ia.br/
+GET https://mcp.hero.ia.br/.well-known/openai-apps-challenge
+POST https://mcp.hero.ia.br/mcp
+```
 
 ## Exemplo de chamada esperada
 
