@@ -1,0 +1,35 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.json",
+  "app_info": {
+    "name": "HEROAPP Financiamento",
+    "subtitle": "Simule financiamento imobiliario com SAC, PRICE, renda e entrada.",
+    "description": "Calculadora de simulacao de financiamento bancario para imoveis. Permite estimar valor financiado, entrada, prazo, parcelas, comprometimento de renda e cenarios em sistemas SAC e PRICE, ajudando compradores e corretores a comparar possibilidades antes de buscar aprovacao bancaria.",
+    "category": "Finance",
+    "developer": "hero.ia.br",
+    "website_url": "https://hero.ia.br/",
+    "customer_support_url": "https://hero.ia.br/Linktree/",
+    "privacy_policy_url": "https://hero.ia.br/Linktree/",
+    "terms_of_service_url": "https://hero.ia.br/Linktree/",
+    "demo_recording_url": "https://hero.ia.br/Linktree/"
+  },
+  "mcp_server": {
+    "server_url": "https://SEU-DOMINIO-PUBLICO/mcp",
+    "authentication": {
+      "type": "none"
+    }
+  },
+  "testing": {
+    "developer_mode_test_prompts": [
+      "Simule um financiamento de imovel de R$ 500.000, entrada de R$ 100.000, renda de R$ 12.000, prazo de 35 anos, sistema SAC.",
+      "Compare SAC e PRICE para imovel de R$ 800.000, entrada de R$ 200.000, FGTS de R$ 50.000, renda mensal de R$ 18.000 e prazo de 420 meses.",
+      "Calcule se a parcela compromete mais de 30% da renda para imovel de R$ 450.000, entrada de R$ 50.000, renda de R$ 8.000 e prazo de 30 anos."
+    ]
+  },
+  "commerce": {
+    "links_or_directs_users_outside_chatgpt_to_make_purchases": false,
+    "facilitates_purchase_of_digital_goods_services_or_subscriptions": false,
+    "processes_or_facilitates_prohibited_payments": false,
+    "payments_comply_with_applicable_laws": true,
+    "products_to_sell": "Calculadora de simulacao de financiamento bancario para imoveis. Nao ha venda direta dentro do app."
+  }
+}
